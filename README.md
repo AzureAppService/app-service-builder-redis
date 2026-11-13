@@ -1,5 +1,8 @@
 # PulseBoard: Azure Managed Redis on App Service Builder
 
+Fork the [canonical sample](https://github.com/AzureAppService/app-service-builder-redis) into your GitHub account.
+This integration is not in the Portal template gallery; create an app from your fork and follow the resource setup below.
+
 PulseBoard preserves the original React/Express dashboard: atomic counters, a
 sorted-set leaderboard and a cache explorer with hit/miss and TTL demonstrations.
 The backend connects to **separately provisioned Azure Managed Redis** over TLS
