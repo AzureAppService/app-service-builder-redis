@@ -6,6 +6,9 @@ Never substitute a larger SKU or weaken an existing cache network policy.
 
 ## Create the app and restricted data policy
 
+The app template uses minimum 0 / maximum 2 HTTP replicas and preserves idle timeout.
+Preview requires a minimum of zero; do not disable idle timeout.
+
 Set `SUBSCRIPTION`, `RG`, unique new `APP`, `CACHE` and `NAMESPACE=demo`.
 
 ```bash
