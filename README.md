@@ -183,8 +183,8 @@ principal; it refreshes tokens and reauthenticates as before.
 [connection.json](connection.json) provides the full desired object. Replace
 destination placeholders; keep the generated username value empty in pending
 configuration. This profile requires managed identity, not password/key auth.
-Named Managed Redis delivery remains **Under construction** until its deployed
-customer journey is qualified; local tests are not Redis connectivity proof.
+The production catalog advertises Managed Redis Connections; qualification of
+this revision's deployed operations remains pending. Local tests are not Redis connectivity proof.
 The [Connections guide](https://builder.appservice.azure.com/docs/guides/connect-to-services/)
 covers client availability and ETag-guarded ARM setup. Installed CLI 0.0.2 does
 not include Connections. Saving the object alone does not deploy or assign
