@@ -2,13 +2,14 @@ const { createCluster } = require('@redis/client');
 const { DefaultAzureCredential, ManagedIdentityCredential } = require('@azure/identity');
 const { EntraIdCredentialsProviderFactory, REDIS_SCOPE_DEFAULT } = require('@redis/entraid');
 const { isIP } = require('node:net');
-const { readConfig } = require('./config');
+const { readConfig, connectionCredential } = require('./config');
 const { createRenewalDiagnostics } = require('./renewalDiagnostics');
 
 function createConnection({ config = readConfig(), credential, observeRefresh } = {}) {
   credential ||= config.mode === 'developer'
     ? new DefaultAzureCredential()
     : new ManagedIdentityCredential(config.clientId ? { clientId: config.clientId } : {});
+  credential = connectionCredential(credential, config.username);
   const diagnostics = createRenewalDiagnostics();
   if (diagnostics) credential = diagnostics.wrapCredential(credential);
   const provider = EntraIdCredentialsProviderFactory.createForDefaultAzureCredential({

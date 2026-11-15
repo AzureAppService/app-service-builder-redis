@@ -1,5 +1,14 @@
 function readConfig(env = process.env) {
-  const endpoint = env.REDIS_ENDPOINT;
+  const named = ['REDIS_HOST', 'REDIS_PORT', 'REDIS_USERNAME', 'REDIS_TLS'].some(name => env[name] !== undefined);
+  if (named && env.REDIS_ENDPOINT !== undefined) {
+    throw new Error('Remove REDIS_ENDPOINT before using the Connections host/port mappings.');
+  }
+  if (named && (env.REDIS_TLS !== 'true' ||
+    !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(env.REDIS_USERNAME ?? '') ||
+    env.REDIS_USERNAME === '00000000-0000-0000-0000-000000000000')) {
+    throw new Error('Connections requires REDIS_TLS=true and the selected managed identity principal ID in REDIS_USERNAME.');
+  }
+  const endpoint = named ? `${env.REDIS_HOST ?? ''}:${env.REDIS_PORT ?? ''}` : env.REDIS_ENDPOINT;
   if (!endpoint || !/^[a-zA-Z0-9.-]+:\d+$/.test(endpoint)) {
     throw new Error('REDIS_ENDPOINT must be hostname:port from Azure Managed Redis (no URL or credentials)');
   }
@@ -17,7 +26,26 @@ function readConfig(env = process.env) {
   if (mode === 'developer' && (env.IDENTITY_ENDPOINT || env.MSI_ENDPOINT || env.WEBSITE_INSTANCE_ID)) {
     throw new Error('Developer authentication is local-only; use managed-identity in Azure');
   }
-  return { endpoint, host, port, namespace, mode, clientId: env.AZURE_CLIENT_ID };
+  return { endpoint, host, port, namespace, mode, clientId: env.AZURE_CLIENT_ID, username: named ? env.REDIS_USERNAME : undefined };
+}
+
+function connectionCredential(credential, username) {
+  if (!username) return credential;
+  return {
+    async getToken(...args) {
+      const token = await credential.getToken(...args);
+      let principal;
+      try {
+        principal = JSON.parse(Buffer.from(token.token.split('.')[1], 'base64url').toString()).oid;
+      } catch {
+        throw new Error('Redis identity token does not contain a valid principal.');
+      }
+      if (typeof principal !== 'string' || principal.toLowerCase() !== username.toLowerCase()) {
+        throw new Error('Redis SDK identity does not match the identity selected in Connections.');
+      }
+      return token;
+    },
+  };
 }
 
 function keyPrefix(namespace) {
@@ -25,4 +53,4 @@ function keyPrefix(namespace) {
   return `pulseboard:{${namespace}}:`;
 }
 
-module.exports = { readConfig, keyPrefix };
+module.exports = { readConfig, keyPrefix, connectionCredential };

@@ -1,0 +1,12 @@
+{
+  "name": "cache",
+  "type": "managedRedis",
+  "resourceId": "/subscriptions/<subscription-id>/resourceGroups/<cache-group>/providers/Microsoft.Cache/redisEnterprise/<cache>",
+  "managedIdentity": { "type": "SystemAssigned" },
+  "settings": [
+    { "field": "host", "value": "<cache>.westus2.redis.azure.net", "environmentVariable": "REDIS_HOST" },
+    { "field": "port", "value": "10000", "environmentVariable": "REDIS_PORT" },
+    { "field": "username", "value": "", "environmentVariable": "REDIS_USERNAME" },
+    { "field": "tls", "value": "true", "environmentVariable": "REDIS_TLS" }
+  ]
+}

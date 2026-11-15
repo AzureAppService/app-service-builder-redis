@@ -163,14 +163,32 @@ Do not set `AZURE_CLIENT_ID` for system-assigned identity.
 
 ## 3. Configure and deploy PulseBoard
 
-Save only these non-secret variables on Builder's Variables page:
+In **Connections**, add **Managed Redis**, select your provisioned cache and
+the app's system-assigned **Managed identity**. Use these mappings:
 
 | Variable | Value |
 | --- | --- |
-| `REDIS_ENDPOINT` | Provisioning output, such as `name.westus2.redis.azure.net:10000` |
-| `REDIS_NAMESPACE` | `demo`, matching the data access grant |
-| `REDIS_AUTH_MODE` | `managed-identity` (default) |
-| `AZURE_CLIENT_ID` | Unset for system identity; selected user identity client ID otherwise |
+| `REDIS_HOST` | Hostname from the provisioning output, without scheme or port |
+| `REDIS_PORT` | `10000` |
+| `REDIS_USERNAME` | Generated from the selected identity's principal ID; leave its pending value empty |
+| `REDIS_TLS` | `true` |
+
+Keep only `REDIS_NAMESPACE=demo` and optional `REDIS_AUTH_MODE=managed-identity`
+in Variables; leave `AZURE_CLIENT_ID` unset for system identity. When migrating,
+remove `REDIS_ENDPOINT` without deploying before saving the connection. Mixed
+legacy and named mappings fail explicitly. The SDK derives its username from
+the Entra token and verifies it matches the selected connection's generated
+principal; it refreshes tokens and reauthenticates as before.
+
+[connection.json](connection.json) provides the full desired object. Replace
+destination placeholders; keep the generated username value empty in pending
+configuration. This profile requires managed identity, not password/key auth.
+Named Managed Redis delivery remains **Under construction** until its deployed
+customer journey is qualified; local tests are not Redis connectivity proof.
+The [Connections guide](https://builder.appservice.azure.com/docs/guides/connect-to-services/)
+covers client availability and ETag-guarded ARM setup. Installed CLI 0.0.2 does
+not include Connections. Saving the object alone does not deploy or assign
+the Redis data policy.
 
 Variables are captured by the next version build. Saving them does not change
 an already running version. Builder sets the runtime port; the manifest declares
