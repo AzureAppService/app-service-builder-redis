@@ -66,6 +66,9 @@ and restrict it to your testers; do not expose it as a production public API.
 
 ## Prerequisites
 
+[CLI and ordered ARM/Bicep setup](docs/connection-automation.md) is available as an alternative to Portal.
+Redis data policy and visitor access remain separate from saving a connection.
+
 - Node.js 24 and npm for local development.
 - Azure CLI and Bicep, an explicitly chosen subscription, an existing DEV/TEST
   resource group and permission to provision new Redis dependencies.
@@ -186,8 +189,9 @@ configuration. This profile requires managed identity, not password/key auth.
 The production catalog advertises Managed Redis Connections; qualification of
 this revision's deployed operations remains pending. Local tests are not Redis connectivity proof.
 The [Connections guide](https://builder.appservice.azure.com/docs/guides/connect-to-services/)
-covers client availability and ETag-guarded ARM setup. Installed CLI 0.0.2 does
-not include Connections. Saving the object alone does not deploy or assign
+covers client availability and ETag-guarded ARM setup. The concrete
+[CLI/ARM alternatives](docs/connection-automation.md) require a Connections-capable
+CLI release for native commands. Saving the object alone does not deploy or assign
 the Redis data policy.
 
 Variables are captured by the next version build. Saving them does not change

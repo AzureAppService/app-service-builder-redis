@@ -32,3 +32,4 @@ jobs:
       - run: |
           az bicep build --file infra/main.bicep --stdout > /dev/null
           az bicep build --file infra/access.bicep --stdout > /dev/null
+          az bicep build --file infra/app.bicep --stdout > /dev/null
